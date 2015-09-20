@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Leiningen: clj-http:2.0.0">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/clj-http/clj-http/2.0.0/clj-http-2.0.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
