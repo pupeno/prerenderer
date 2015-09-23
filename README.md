@@ -171,9 +171,9 @@ specific and you don't want to ship with your application. If you have your Cloj
 configuration looks like this:
 
 ```clojure
-:cljsbuild {:builds {:app         {:source-paths ["src/cljs"]
-                                   :compiler     {:output-dir "resources/public/js/app"
-                                                  :output-to  "resources/public/js/app.js"}}}}
+:cljsbuild {:builds {:app {:source-paths ["src/cljs"]
+                           :compiler     {:output-dir "resources/public/js/app"
+                                          :output-to  "resources/public/js/app.js"}}}}
 ```
 
 You'll want to add a second build so it'll look like this:
