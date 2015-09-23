@@ -35,7 +35,7 @@ a JavaScript engine shipped with Java 8 but we found it tool limited. For exampl
 which is very likely used in a SPA.
 
 When Nashorn was abandoned, we looked at the many possibilities, like PhantomJS. Ultimately we decided to give NodeJS a
-try because it first like a first class in the ClojureScript world as the compiler can target it natively, but also
+try because it felt like a first class in the ClojureScript world as the compiler can target it natively, but also
 because of the performance of the V8 engine and the wide availability of modules to implement the functionality we need
 such as XMLHttpRequest, file system access, web servers, etc.
 
