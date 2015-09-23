@@ -1,7 +1,7 @@
 ;;;; Copyright © 2015 Carousel Apps, Ltd. All rights reserved.
 
 (defproject com.carouselapps/prerenderer "0.1.0-SNAPSHOT"
-  :description "Server pre-rendering for Single Page Applications using ClojureScript/JavaScript"
+  :description "Server pre-rendering for Single Page Applications using ClojureScript/JavaScript by use of NodeJS."
   :url "https://CarouselApps.com/prerenderer"
   :license {:name "Eclipse Public License"
             :url  "http://www.eclipse.org/legal/epl-v10.html"}
