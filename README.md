@@ -118,7 +118,7 @@ Most likely you want to keep the JavaScript engine in an atom:
 ```
 
 When you run Prerenderer like that, if `target/js/server-side.js` is not present, it'll raise an exception. You can tell
-it to wait for it to appear, useful in development mode, by passing the attribute `wait`
+it to wait for it to appear, useful in development mode, by passing the attribute `:wait`:
 
 ```clojure
 (reset! js-engine (prerenderer/run {:path "target/js/server-side.js"
@@ -126,7 +126,7 @@ it to wait for it to appear, useful in development mode, by passing the attribut
 ```
 
 If your JavaScript app runs AJAX requests with relative paths (very common) such as `GET /users`, the app will make the
-request to `localhost:3000`. You can define both of this by passing `default-ajax-host` and `default-ajax-port`:
+request to `localhost:3000`. You can define both of this by passing `:default-ajax-host` and `:default-ajax-port`:
 
 ```clojure
 (reset! js-engine (prerenderer/run {:path              "target/js/server-side.js"
@@ -167,7 +167,7 @@ to your list of ignored files for your source control system (`.gitignore`, `.hg
 
 You need to compile the application for running in NodeJS and you'll also need to include some extra code that is NodeJS
 specific and you don't want to ship with your application. If you have your ClojureScript in `src/cljs`, I'd recommend
-`src/node`; and if you have it on `src-cljs`, I'd go for `src-node`. It's up to you. Let's say your `cljsbuild`
+`src/node`; and if you have it on `src-cljs`, I'd go for `src-node`. It's up to you. Let's say your cljsbuild
 configuration looks like this:
 
 ```clojure
@@ -201,16 +201,15 @@ and they are not really needed.
 As a reference, this is what I would use for a dev profile:
 
 ```clojure
-
 :server-side {:compiler {:optimizations :none
                          :source-map    true
                          :pretty-print  true
-                         :verbose       true}
+                         :verbose       true}}
 ```
 
 and this for an uberjar:
 
-```
+```clojure
 :server-side {:compiler {:optimizations :none
                          :source-map    true
                          :pretty-print  true}}
@@ -296,11 +295,11 @@ by adding:
 ```
 
 to your uberjar profile. You can get some background about this issue in
-[lein-npm/issues/28](https://github.com/RyanMcG/lein-npm/issues/28)
+[lein-npm/issues/28](https://github.com/RyanMcG/lein-npm/issues/28).
 
 ## License
 
-This library has been extracted from the project [Ninja Tools](http://tools.screensaver.ninja)
+This library has been extracted from the project [Ninja Tools](http://tools.screensaver.ninja).
 
 Copyright © 2015 Carousel Apps, Ltd. All rights reserved.
 
