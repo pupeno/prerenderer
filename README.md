@@ -58,7 +58,7 @@ our [own release of node-XMLHttpRequest: @pupeno/node-XMLHttpRequest](https://ww
 
 The elephant in the room of course is that SPAs are never *done*. Imagine a SPA that has a timer and every second sends
 a request to the server, and the server replies with the current time, which then the application displays. When is it
-done rendering? Never. But Prerendering needs to, at some point, decide that the page is *done enough* and ship it to
+done rendering? Never. But Prerenderer needs to, at some point, decide that the page is *done enough* and ship it to
 the browser. Doing this perfect is between hard to impossible and it's very dependant on the framework you use to drive
 your SPA.
 
