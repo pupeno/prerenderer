@@ -299,6 +299,16 @@ by adding:
 to your uberjar profile. You can get some background about this issue in
 [lein-npm/issues/28](https://github.com/RyanMcG/lein-npm/issues/28).
 
+## Changelog
+
+### v0.2.0
+- Function to stop JavaScript engine.
+- Renamed run to start! to match stop!
+
+### v0.1.0 - 2015-09-23
+- Initial version. For more information, check out https://carouselapps.com/2015/10/02/isomorphic-javascript-with-clojurescript-for-pre-rendering-single-page-applications-part-3/
+
+
 ## License
 
 This library has been extracted from the project [Ninja Tools](http://tools.screensaver.ninja).
