@@ -65,7 +65,7 @@
                           "--default-ajax-port" (str (:default-ajax-port js-engine))])
     .inheritIO))
 
-(defn run [options]
+(defn start! [options]
   (let [js-engine (merge {:path              nil
                           :process           nil
                           :default-ajax-host "localhost"
