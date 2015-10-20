@@ -83,6 +83,10 @@
           js-engine (assoc js-engine :process process)]
       (assoc js-engine :port-number (get-port-number js-engine)))))
 
+(defn stop! [js-engine]
+  (.destroy (:process js-engine))
+  js-engine)
+
 (defn render [js-engine url headers]
   (ensure-engine-is-running! js-engine)
   (let [url (str "http://localhost:" (:port-number js-engine) "/render?" (http/generate-query-string {:url url}))]
