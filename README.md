@@ -302,8 +302,10 @@ to your uberjar profile. You can get some background about this issue in
 ## Changelog
 
 ### v0.2.0
-- Function to stop JavaScript engine.
+- Added Function to stop JavaScript engine.
 - Renamed run to start! to match stop!
+- Added option :noop-when-stopped that will make prerenderer just issue a warning when the JavaScript engine is not
+running.
 
 ### v0.1.0 - 2015-09-23
 - Initial version. For more information, check out https://carouselapps.com/2015/10/02/isomorphic-javascript-with-clojurescript-for-pre-rendering-single-page-applications-part-3/
