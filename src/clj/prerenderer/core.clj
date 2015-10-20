@@ -54,10 +54,6 @@
             port-number)))
       (throw (Exception. (str "Waited for " (:start-timeout js-engine) " for " (:path js-engine) " to start and report its port number but it timed out.")))))
 
-(defn ensure-engine-is-running! [js-engine]
-  (when (not (is-running? js-engine))
-    (throw (Exception. (str "Prerendering JavaScript engine not running:" js-engine)))))
-
 (defn create-process-builder [js-engine]
   (doto (ProcessBuilder. ["node" (:path js-engine)
                           "--port-file" (:port-file js-engine)
@@ -73,7 +69,8 @@
                           :port-file         (.getPath (doto (File/createTempFile (str "com.carouselapps.prerenderer-" *ns* "-") ".port")
                                                          .deleteOnExit))
                           :start-timeout     5000
-                          :wait              false}
+                          :wait              false
+                          :noop-when-stopped false}
                          options)]
     (if (nil? (:path js-engine))
       (throw (Exception. "Path should be specified when starting a pre-rendering engine.")))
@@ -88,6 +85,10 @@
   js-engine)
 
 (defn render [js-engine url headers]
-  (ensure-engine-is-running! js-engine)
-  (let [url (str "http://localhost:" (:port-number js-engine) "/render?" (http/generate-query-string {:url url}))]
-    (:body (http/get url {:headers headers}))))
+  (if (is-running? js-engine)
+    (let [url (str "http://localhost:" (:port-number js-engine) "/render?" (http/generate-query-string {:url url}))]
+      (:body (http/get url {:headers headers})))
+    (let [message (str "Prerendering JavaScript engine not running when attempting to render " url  ". Options: " js-engine)]
+      (if (:noop-when-stopped js-engine)
+        (println message)
+        (throw (Exception. message))))))
