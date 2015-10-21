@@ -88,7 +88,7 @@
   (if (is-running? js-engine)
     (let [url (str "http://localhost:" (:port-number js-engine) "/render?" (http/generate-query-string {:url url}))]
       (:body (http/get url {:headers headers})))
-    (let [message (str "Prerendering JavaScript engine not running when attempting to render " url  ". Options: " js-engine)]
+    (let [message (str "Prerendering JavaScript engine not running when attempting to render " url  ". JavaScript Engine: " js-engine)]
       (if (:noop-when-stopped js-engine)
         (println message)
         (throw (Exception. message))))))
