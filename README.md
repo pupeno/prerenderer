@@ -138,6 +138,13 @@ request to `localhost:3000`. You can define both of this by passing `:default-aj
 
 You want them to point to where the Clojure server is running. In many cases for example, the port will be random.
 
+Also, you may want to specify the working directory for the Node.js process like this:
+
+```clojure
+(reset! js-engine (prerenderer/run {:path              "js/server-side.js"
+                                    :working-directory "target"})))
+```
+
 After that, prerendering happens by simply doing:
 
 ```clojure
@@ -302,6 +309,7 @@ to your uberjar profile. You can get some background about this issue in
 ## Changelog
 
 ### v0.2.0
+- Added an option to specify the working directory for the JavaScript engine.
 - Added Function to stop JavaScript engine.
 - Renamed run to start! to match stop!
 - Added option :noop-when-stopped that will make prerenderer just issue a warning when the JavaScript engine is not
