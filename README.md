@@ -258,7 +258,7 @@ a total time has elapsed (3s by default) and then, call a function.
 
 Using this function, pre-rendering would look something like:
 
-```
+```clojure
 (defn render [req res]
   (let [page-path (.-path (.parse url (.-url (.-query req))))]
     (prerenderer.re-frame/dispatch-super-sync [current-page page-path]
@@ -267,7 +267,7 @@ Using this function, pre-rendering would look something like:
 
 or if you want to specify your own timeouts (100ms between events, 5000ms total):
 
-```
+```clojure
 (defn render [req res]
   (let [page-path (.-path (.parse url (.-url (.-query req))))]
     (prerenderer.re-frame/dispatch-super-sync [current-page page-path]
@@ -285,7 +285,7 @@ If you want to stay up to date on this matter, I'd recommend following this issu
 [heroku-buildpack-clojure/issues/44](https://github.com/heroku/heroku-buildpack-clojure/issues/44). In the meantime, you
 need to use the nodejs branch of the Clojure buildpack:
 
-```
+```bash
 $ heroku buildpacks:set https://github.com/heroku/heroku-buildpack-clojure#nodejs
 ```
 
