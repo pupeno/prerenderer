@@ -15,6 +15,8 @@
 
 (def cookie-parser (nodejs/require "cookie-parser"))
 
+(def url (nodejs/require "url"))
+
 ; Set an environment that ressembles a browser, with ajax and alert.
 (def xmlhttprequest (nodejs/require "@pupeno/xmlhttprequest"))
 (goog.object/set js/global "XMLHttpRequest" (.-XMLHttpRequest xmlhttprequest))
@@ -49,7 +51,11 @@
   (println msg)
   (.exit js/process status))
 
-(defn create [render name]
+(defn- get-path [request]
+  "Get the path from an Express request."
+  (.-path (.parse url (.-url (.-query request)))))
+
+(defn create [render-and-send name]
   (fn [& args]
     (let [{:keys [options _arguments errors summary]} (parse-opts args cli-options)]
       (cond
@@ -59,7 +65,9 @@
       (aset (.-defaults xmlhttprequest) "port" (:default-ajax-port options))
       (let [app (-> (express)
                     (.use (cookie-parser))
-                    (.get "/" (fn [_req res] (.send res "Universal JavaScript engine for server side pre-rendering single page applications.")))
-                    (.get "/render" render))
+                    (.get "/" (fn [_request responce] (.send responce "Universal JavaScript engine for server side pre-rendering single page applications.")))
+                    (.get "/render" (fn [request responce]
+                                      (let [send-to-browser (fn [content] (.send responce content))]
+                                        (render-and-send (get-path request) send-to-browser)))))
             server (.createServer http app)]
         (.listen server 0 (fn [] (.writeFile fs (:port-file options) (.-port (.address server)))))))))
