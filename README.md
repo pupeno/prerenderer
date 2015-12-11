@@ -140,6 +140,13 @@ request to `localhost:3000`. You can define both of this by passing `:default-aj
 For an actual example of this, look at [Ninja Tool's core.clj, around line 23](https://github.com/carouselapps/ninjatools/blob/master/src/clj/ninjatools/core.clj#L23).
 You want them to point to where the Clojure server is running. In many cases for example, the port will be random.
 
+Also, you may want to specify the working directory for the Node.js process like this:
+
+```clojure
+(reset! js-engine (prerenderer/run {:path              "js/server-side.js"
+                                    :working-directory "target"})))
+```
+
 After that, prerendering happens by simply doing:
 
 ```clojure
@@ -305,6 +312,7 @@ to your uberjar profile. You can get some background about this issue in
 ### v0.2.0
 - Changed the ClojureScript API to hide NodeJS details.
 - New re-frame implementation that depends on re-frame 0.6.0 but not on a fork.
+- Added an option to specify the working directory for the JavaScript engine.
 - Added Function to stop JavaScript engine.
 - Renamed run to start! to match stop!
 - Added option :noop-when-stopped that will make prerenderer just issue a warning when the JavaScript engine is not

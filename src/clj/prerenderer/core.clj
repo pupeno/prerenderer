@@ -10,16 +10,19 @@
 (defn ensure-javascript-exists
   ([js-engine] (ensure-javascript-exists js-engine false))
   ([js-engine notify-about-file-appearing]
-   (if (not (.exists (io/as-file (:path js-engine))))
-     (let [message (str "File " (:path js-engine) " for prerendering is not present. Did you compile your JavaScript? 'lein cljsbuild auto' maybe?")]
-       (if (:wait js-engine)
-         (do
-           (println message "Waiting until it appears...")
-           (Thread/sleep 100)
-           (recur js-engine true))
-         (throw (Exception. message))))
-     (when notify-about-file-appearing
-       (println "File" (:path js-engine) "appeared. Pfiuuu!")))))
+   (let [path (:path js-engine)
+         working-directory (:working-directory js-engine ".")
+         full-path (.getAbsolutePath (java.io.File. working-directory path))]
+     (if-not (.exists (io/as-file full-path))
+       (let [message (str "File " full-path " for prerendering is not present. Did you compile your JavaScript? 'lein cljsbuild auto' maybe?")]
+         (if (:wait js-engine)
+           (do
+             (println message "Waiting until it appears...")
+             (Thread/sleep 100)
+             (recur js-engine true))
+           (throw (Exception. message))))
+       (when notify-about-file-appearing
+         (println "File" full-path "appeared. Pfiuuu!"))))))
 
 (defn read-port-file [js-engine]
   (slurp (:port-file js-engine)))
@@ -59,7 +62,8 @@
                           "--port-file" (:port-file js-engine)
                           "--default-ajax-host" (:default-ajax-host js-engine)
                           "--default-ajax-port" (str (:default-ajax-port js-engine))])
-    .inheritIO))
+    .inheritIO
+    (.directory (io/file (:working-directory js-engine)))))
 
 (defn start! [options]
   (let [js-engine (merge {:path              nil
@@ -70,10 +74,13 @@
                                                          .deleteOnExit))
                           :start-timeout     5000
                           :wait              false
-                          :noop-when-stopped false}
+                          :noop-when-stopped false
+                          :working-directory "."}
                          options)]
     (if (nil? (:path js-engine))
       (throw (Exception. "Path should be specified when starting a pre-rendering engine.")))
+    (if-not (.exists (io/as-file (:working-directory js-engine)))
+      (throw (Exception. "Working directory should exist when starting a pre-rendering engine.")))
     (ensure-javascript-exists js-engine)
     (blank-port-file! js-engine)
     (let [process (.start (create-process-builder js-engine))
