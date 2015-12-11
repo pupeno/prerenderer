@@ -15,7 +15,6 @@
   ([component send-to-browser event-timeout total-timeout]
    (let [events-in-last-timeout-window (atom 0)
          start-time (current-time)]
-     (println "Starting rendering" start-time)
      (re-frame/add-post-event-callback (fn [event-v queue]
                                          (println (first event-v))
                                          (swap! events-in-last-timeout-window inc)))
@@ -23,8 +22,6 @@
        (<! (timeout event-timeout))
        (when-not (or (= @events-in-last-timeout-window 0)
                      (> (- (current-time) start-time) total-timeout))
-         (println "Still rendering" (- (current-time) start-time))
          (reset! events-in-last-timeout-window 0)
          (recur))
-       (println "Done rendering" (- (current-time) start-time))
        (send-to-browser (reagent/render-to-string component))))))
