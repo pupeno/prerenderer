@@ -7,13 +7,14 @@ Applications) by use of NodeJS.
 
 SPAs are the ones that ship a minimal HTML and a JavaScript application to the browser and then the
 JavaScript running in the browser renders the application. Some notable examples of this technique is Google Maps (the
-one that started it all) and GMail.
+one that started it all) and GMail. If you want to see a live demo of a SPA, check out our screencast
+[What is a Single Page Application?](https://carouselapps.com/2015/11/19/what-is-a-single-page-application/).
 
 This method of developing applications lead to a much better user experience as the application is snappier so it feels
 similar to a native application and at the same time it can react to user events that the traditional mode of
 development tend to ignore. In the Clojure world libraries such as
-[Reagent](https://github.com/reagent-project/reagent), [re-frame](https://github.com/Day8/re-frame),
-[Om](https://github.com/omcljs/om), etc. help with this task.
+[Reagent](https://github.com/reagent-project/reagent), [re-frame](https://github.com/Day8/re-frame), [Om](https://github.com/omcljs/om),
+etc. help with this task.
 
 The problem with developing applications like this is that not all user agents execute JavaScript. Notably search engine
 crawlers will fetch those pages and index them as no content, as the content would come later when JavaScript runs. Also
@@ -31,56 +32,52 @@ have proposed universal JavaScript instead.
 ## Design
 
 NodeJS was not our first choice of technology for this task and indeed it came with its many complexities that this
-library tries to abstract away. We first
-[attempted to use Nashorn](https://carouselapps.com/2015/09/11/isomorphic-clojurescriptjavascript-for-pre-rendering-single-page-applications-part-1/),
+library tries to abstract away. We first [attempted to use Nashorn](https://carouselapps.com/2015/09/11/isomorphic-clojurescriptjavascript-for-pre-rendering-single-page-applications-part-1/),
 a JavaScript engine shipped with Java 8 but we found it tool limited. For example, it doesn't implement XMLHttpRequest
 which is very likely used in a SPA.
 
-When Nashorn was abandoned, we looked at the many possibilities, like PhantomJS. Ultimately we decided to give NodeJS a
-try because it felt like a first class in the ClojureScript world as the compiler can target it natively, but also
+When Nashorn was abandoned, we looked at the many possibilities, like PhantomJS. Ultimately we decided to
+[give NodeJS a try]https://carouselapps.com/2015/10/02/isomorphic-javascript-with-clojurescript-for-pre-rendering-single-page-applications-part-3/
+because it felt like a first class in the ClojureScript world as the compiler can target it natively, but also
 because of the performance of the V8 engine and the wide availability of modules to implement the functionality we need
 such as XMLHttpRequest, file system access, web servers, etc.
 
-Prerenderer starts a NodeJS process in the background that loads your application. It creates a web server that binds
-a random port and reports the port to a know file. The Clojure side of Prerenderer picks up that port and whenever you
-request to pre-render a page it'll send a request to that port. Back inside NodeJS, Prerender will call a function that
-you define that will do the actual pre-render and then return it back to Clojure.
+[Prerenderer](https://carouselapps.com/prerenderer) starts a NodeJS process in the background that loads your
+application. It creates a web server that binds a random port and reports the port to a know file. The Clojure side of
+Prerenderer picks up that port and whenever you request to pre-render a page it'll send a request to that port. Back
+inside NodeJS, Prerender will call a function that you define that will do the actual pre-render and then return it back
+to Clojure.
 
-Prerenderer abstracts away as completely as possible the details of running NodeJS, starting a secondary web process in
-it, sending requests to it, and sending back the results of pre-rendering. As a user of Prerenderer it looks almost as
-if you are calling ClojureScript from Clojure. For the NodeJS web server, it uses the popular
-[express](http://expressjs.com/) micro-framework.
+Prerenderer abstracts away as much as possible the details of running NodeJS, starting a secondary web process in it,
+sending requests to it, and sending back the results of pre-rendering. As a user of Prerenderer it looks almost as if
+you are calling ClojureScript from Clojure. For the NodeJS web server, it uses the popular [express](http://expressjs.com/)
+micro-framework.
 
-For supporting AJAX, Prerenderer uses the
-[XMLHttpRequest NodeJS module](https://github.com/driverdan/node-XMLHttpRequest) but unfortunately we found
-[a bug in it](https://github.com/driverdan/node-XMLHttpRequest/pull/115) and we also needed a feature:
-[to set up default destination for AJAX calls that use relative paths](https://github.com/driverdan/node-XMLHttpRequest/pull/116),
+For supporting AJAX, Prerenderer uses the [XMLHttpRequest NodeJS module](https://github.com/driverdan/node-XMLHttpRequest)
+but unfortunately we found [a bug in it](https://github.com/driverdan/node-XMLHttpRequest/pull/115) and we also needed a
+feature: [to set up default destination for AJAX calls that use relative paths](https://github.com/driverdan/node-XMLHttpRequest/pull/116),
 a very common technique in JavaScript applications. Pull requests have been submitted and until then, Prerenderer uses
 our [own release of node-XMLHttpRequest: @pupeno/node-XMLHttpRequest](https://www.npmjs.com/package/@pupeno/xmlhttprequest).
 
 The elephant in the room of course is that SPAs are never *done*. Imagine a SPA that has a timer and every second sends
 a request to the server, and the server replies with the current time, which then the application displays. When is it
 done rendering? Never. But Prerenderer needs to, at some point, decide that the page is *done enough* and ship it to
-the browser. Doing this perfect is between hard to impossible and it's very dependant on the framework you use to drive
-your SPA.
+the browser.
 
-Currently Prerenderer ships with a simple solution for re-frame but others, such as Om, are welcome, and you can always
-build your own on top of the basic Prerenderer.
+If you are using plain Reagent it's up to you to decide when the application is done enough. If you are using Re-frame,
+Prerenderer ships with a simple helper to help you deal with it. For other libraries/frameworks, such as Om, Om Next,
+Petrol, you'll also have to find the appropriate solution and pull requests are welcome.
 
 ### re-frame
 
-Doing prerendering with re-frame requires
-[tappable event channels](https://github.com/carouselapps/re-frame/commit/64a290d35c68b23f397206652168f4bedbc1d255)
-which is not (*yet?*) in re-frame but you can use our alternative to it that includes the patch we developed:
-[com.carouselapps/re-frame](https://clojars.org/com.carouselapps/re-frame). With this patch, Prerenderer will watch for
-events and once nothing happened for a period of time (300ms by default) it'll consider the application done and if a
-certain amount of time went by (3s by default) even if the application is still active, it'll stop and send it to the
-browser.
+Doing prerendering with re-frame requires version 0.6.0 or later due to the new callback mechanism and queue systems.
+The way it works is that Prerender will watch for events and once nothing happened for a period of time (300ms by
+default) it'll consider the application done and if a certain amount of time went by (3s by default) even if the
+application is still active, it'll stop and send it to the browser.
 
 The current default times are completely arbitrary so don't give them too much credit. It's likely that each application
-will require their own tuning for maximum performance and results. Please, do
-[let us know](https://carouselapps.com/contact-us/) your finding here and we'll use that information for providing
-better defaults in future releases.
+will require their own tuning for maximum performance and results. Please, do [let us know](https://carouselapps.com/contact-us/)
+your finding here and we'll use that information for providing better defaults in future releases.
 
 This solution is far from perfect. Particularly it means that all pages have an extra 300ms load time. There are two
 possible solutions for that:
@@ -89,18 +86,22 @@ possible solutions for that:
 
 ### Om
 
-I don't use Om. Pull requests are welcome.
+We don't use Om. Pull requests are welcome.
+
+### Om Next
+
+We don't use Om Next. Pull requests are welcome.
 
 ### Others
 
-Same as Om, pull requests are welcome.
+Pull requests are welcome.
 
 ## Usage
 
 Include the library on your `project.clj`:
 
 ```clojure
-[com.carouselapps/prerenderer "0.1.0-SNAPSHOT"]
+[com.carouselapps/prerenderer "0.2.0"]
 ```
 
 ### Clojure
@@ -108,7 +109,7 @@ Include the library on your `project.clj`:
 On the Clojure side first, as your application is starting, you need to start the JavaScript engine:
 
 ```clojure
-(prerenderer/run {:path "target/js/server-side.js"}))
+(prerenderer/start! {:path "target/js/server-side.js"}))
 ```
 
 Most likely you want to keep the JavaScript engine in an atom:
@@ -136,6 +137,7 @@ request to `localhost:3000`. You can define both of this by passing `:default-aj
                                     :default-ajax-port 12345})))
 ```
 
+For an actual example of this, look at [Ninja Tool's core.clj, around line 23](https://github.com/carouselapps/ninjatools/blob/master/src/clj/ninjatools/core.clj#L23).
 You want them to point to where the Clojure server is running. In many cases for example, the port will be random.
 
 After that, prerendering happens by simply doing:
@@ -145,7 +147,8 @@ After that, prerendering happens by simply doing:
 ```
 
 where `url` is the URL you are prerendering and `headers` is map of the headers you want the ClojureScript to see
-(important for cookies for example). If you are using Ring, you can do something such as:
+(important for cookies for example, [altough currently not properly supported](https://github.com/carouselapps/prerenderer/issues/14)).
+If you are using Ring, you can do something such as:
 
 ```clojure
 (prerenderer/render @js-engine (ring.util.request/request-url request) (:headers request))
@@ -156,8 +159,8 @@ where `request` is the Ring request.
 ### ClojureScript
 
 The ClojureScript side of Prerenderer is a bit more involved. Prerenderer uses NodeJS and a few JavaScript libraries.
-To install these libraries it uses [npm](https://www.npmjs.com/) so you need the
-[lein-npm plug in](https://github.com/RyanMcG/lein-npm) in your project. Something like:
+To install these libraries it uses [npm](https://www.npmjs.com/) so you need the [lein-npm plug in](https://github.com/RyanMcG/lein-npm)
+in your project. Something like:
 
 ```clojure
 :plugins [; other plugins
@@ -224,56 +227,55 @@ but I didn't look into it yet.
 
 ```clojure
 (ns projectx.node
-  (:require [cljs.nodejs :as nodejs]
-            [prerenderer.core :as prerenderer]))
+  (:require [prerenderer.core :as prerenderer]))
 
-(defn render [req res]
-  ; Do your magic to render the application.
-  )
+(defn render-and-send [page-path send-to-browser]
+  (send-to-browser (render page-path)))
 
-(set! *main-cli-fn* (prerenderer/create render "ProjectX"))
+(set! *main-cli-fn* (prerenderer/create render-and-send "ProjectX"))
 ```
 
-`prerenderer.core/create` takes two arguments: the rendering function and the name of the application. The name of your
-application is only used for logging and reporting purposes and it's just a simple string, whatever you want.
+`prerenderer.core/create` creates the prerenderer and takes two arguments: the rendering function and the name of the
+application. The name of your application is only used for logging and reporting purposes and it's just a simple string,
+whatever you want.
 
-`render` receives two attributes, `req` and `res` which are the [request](http://expressjs.com/4x/api.html#req) and
-[response](http://expressjs.com/4x/api.html#res) as provided by the express web framework. For example, a bogus solution
-that renders "Hello " and the path of the page would look like this:
-
-```clojure
-(def url (nodejs/require "url"))
-
-(defn render [req res]
-  (let [page-path (.-path (.parse url (.-url (.-query req))))]
-    (.send res (str "Hello " page-path))))
-```
+`render-and-send` receives two attributes, `page-path` and `send-to-browser`. `page-path` is the path that is being
+requested, the one you have to render, while `send-to-browser` is a function that will send the data back to the
+browser, that is, triggering a NodeJS Express response.
 
 ### re-frame
 
 It's common in re-frame to start with a minimalistic HTML, trigger and event that then builds the page optionally
-triggering many other events. To achieve this, Prerenderer comes with the badly named function `dispatch-super-sync`
-which will dispatch an event and wait until no more events were dispatched for a period of time (300ms by default) or
-a total time has elapsed (3s by default) and then, call a function.
+triggering many other events. We need to render the page to a string only after all events have been handled. Currently
+we ship a simple heuristic: wait for 300ms of no events being triggered or 3s total, whichever happens first. When it
+looks like the page is rendered, a thunk is called back that should return the desired string to be sent to the client.
 
-Using this function, pre-rendering would look something like:
+Since all of this is asyncronous and JavaScript is single-threaded, we cannot just wait for it to finish and then call
+`send-to-browser`. That's why Prerenderer ships with a helper function, called `render-by-timeout`, which implements the
+heuristics previously described and this is how you use it:
 
-```
-(defn render [req res]
-  (let [page-path (.-path (.parse url (.-url (.-query req))))]
-    (prerenderer.re-frame/dispatch-super-sync [current-page page-path]
-                                              (fn [] (.send res (reagent/render-to-string [views/main-panel]))))))
+```clojure
+(defn render-and-send [page-path send-to-browser]
+  (re-frame/dispatch-sync [:initialize-db])
+  (re-frame/dispatch-sync [:whatever-is-needed-to-render page-path])
+  (re-frame-prerenderer/render-by-timeout [views/main-panel] send-to-browser)))
+
+(set! *main-cli-fn* (prerenderer/create render-and-send "Project X"))
 ```
 
-or if you want to specify your own timeouts (100ms between events, 5000ms total):
+The first argument, is the actual component to be render. In this case, Prerenderer will run~
 
+```clojure
+(reagent/render-to-string [views/main-panel])
 ```
-(defn render [req res]
-  (let [page-path (.-path (.parse url (.-url (.-query req))))]
-    (prerenderer.re-frame/dispatch-super-sync [current-page page-path]
-                                              (fn [] (.send res (reagent/render-to-string [views/main-panel])))
-                                              100 5000)))
+
+and use ```send-to-browser``` to dispatch the result back to the browser. You can specify your own timeouts if you want:
+
+```clojure
+(re-frame-prerenderer/render-by-timeout [views/main-panel] send-to-browser) 400 4000)
 ```
+
+For a real life example of its usage, please, check [Ninja Tool's node.cljs](https://github.com/carouselapps/ninjatools/blob/master/src/node/ninjatools/node.cljs).
 
 ### Heroku
 
@@ -281,11 +283,10 @@ If you are deploying to Heroku, you'll quickly find out that NodeJS is not insta
 NodeJS buildpack won't help because it'll try to detect whether your application is a NodeJS one and it'll fail. Making
 it look like a NodeJS application and adding an empty `package.json` will make lein-npm not work.
 
-If you want to stay up to date on this matter, I'd recommend following this issue
-[heroku-buildpack-clojure/issues/44](https://github.com/heroku/heroku-buildpack-clojure/issues/44). In the meantime, you
-need to use the nodejs branch of the Clojure buildpack:
+If you want to stay up to date on this matter, I'd recommend following this issue [heroku-buildpack-clojure/issues/44](https://github.com/heroku/heroku-buildpack-clojure/issues/44).
+In the meantime, you need to use the nodejs branch of the Clojure buildpack:
 
-```
+```bash
 $ heroku buildpacks:set https://github.com/heroku/heroku-buildpack-clojure#nodejs
 ```
 
@@ -302,6 +303,8 @@ to your uberjar profile. You can get some background about this issue in
 ## Changelog
 
 ### v0.2.0
+- Changed the ClojureScript API to hide NodeJS details.
+- New re-frame implementation that depends on re-frame 0.6.0 but not on a fork.
 - Added Function to stop JavaScript engine.
 - Renamed run to start! to match stop!
 - Added option :noop-when-stopped that will make prerenderer just issue a warning when the JavaScript engine is not
@@ -309,7 +312,6 @@ running.
 
 ### v0.1.0 - 2015-09-23
 - Initial version. For more information, check out https://carouselapps.com/2015/10/02/isomorphic-javascript-with-clojurescript-for-pre-rendering-single-page-applications-part-3/
-
 
 ## License
 
