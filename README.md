@@ -117,24 +117,24 @@ Most likely you want to keep the JavaScript engine in an atom:
 ```clojure
 (def js-engine (atom nil))
 
-(reset! js-engine (prerenderer/run {:path "target/js/server-side.js"})))
+(reset! js-engine (prerenderer/start! {:path "target/js/server-side.js"})))
 ```
 
 When you run Prerenderer like that, if `target/js/server-side.js` is not present, it'll raise an exception. You can tell
 it to wait for it to appear, useful in development mode, by passing the attribute `:wait`:
 
 ```clojure
-(reset! js-engine (prerenderer/run {:path "target/js/server-side.js"
-                                    :wait true})))
+(reset! js-engine (prerenderer/start! {:path "target/js/server-side.js"
+                                       :wait true})))
 ```
 
 If your JavaScript app runs AJAX requests with relative paths (very common) such as `GET /users`, the app will make the
 request to `localhost:3000`. You can define both of this by passing `:default-ajax-host` and `:default-ajax-port`:
 
 ```clojure
-(reset! js-engine (prerenderer/run {:path              "target/js/server-side.js"
-                                    :default-ajax-host "192.168.1.1"
-                                    :default-ajax-port 12345})))
+(reset! js-engine (prerenderer/start! {:path              "target/js/server-side.js"
+                                       :default-ajax-host "192.168.1.1"
+                                       :default-ajax-port 12345})))
 ```
 
 For an actual example of this, look at [Ninja Tool's core.clj, around line 23](https://github.com/carouselapps/ninjatools/blob/master/src/clj/ninjatools/core.clj#L23).
@@ -143,8 +143,8 @@ You want them to point to where the Clojure server is running. In many cases for
 Also, you may want to specify the working directory for the Node.js process like this:
 
 ```clojure
-(reset! js-engine (prerenderer/run {:path              "js/server-side.js"
-                                    :working-directory "target"})))
+(reset! js-engine (prerenderer/start! {:path              "js/server-side.js"
+                                       :working-directory "target"})))
 ```
 
 After that, prerendering happens by simply doing:
