@@ -100,9 +100,7 @@ Pull requests are welcome.
 
 Include the library on your `project.clj`:
 
-```clojure
-[com.carouselapps/prerenderer "0.2.0"]
-```
+[![Clojars Project](http://clojars.org/com.carouselapps/prerenderer/latest-version.svg)](http://clojars.org/com.carouselapps/prerenderer)
 
 ### Clojure
 
