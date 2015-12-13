@@ -312,7 +312,7 @@ to your uberjar profile. You can get some background about this issue in
 ### v0.2.0
 - Changed the ClojureScript API to hide NodeJS details.
 - New re-frame implementation that depends on re-frame 0.6.0 but not on a fork.
-- Added an option to specify the working directory for the JavaScript engine.
+- [Added an option to specify the working directory for the JavaScript engine. Courtesy of Andrey Subbotin.](https://github.com/carouselapps/prerenderer/pull/12)
 - Added Function to stop JavaScript engine.
 - Renamed run to start! to match stop!
 - Added option :noop-when-stopped that will make prerenderer just issue a warning when the JavaScript engine is not
