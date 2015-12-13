@@ -309,7 +309,7 @@ to your uberjar profile. You can get some background about this issue in
 
 ## Changelog
 
-### v0.2.0
+### v0.2.0 - 2015-12-13
 - Changed the ClojureScript API to hide NodeJS details.
 - New re-frame implementation that depends on re-frame 0.6.0 but not on a fork.
 - [Added an option to specify the working directory for the JavaScript engine. Courtesy of Andrey Subbotin.](https://github.com/carouselapps/prerenderer/pull/12)
