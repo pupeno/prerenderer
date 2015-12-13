@@ -1,5 +1,7 @@
 # Prerenderer
 
+[![Code at GitHub](https://img.shields.io/badge/code-github-green.svg)](https://github.com/carouselapps/prerenderer)
+[![Clojars](https://img.shields.io/clojars/v/com.carouselapps/prerenderer.svg)](https://clojars.org/com.carouselapps/prerenderer)
 [![Join the chat at https://gitter.im/carouselapps/prerenderer](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/carouselapps/prerenderer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 This library helps implementing server side prerendering of ClojureScript heavy applications such SPAs (Single Page
